@@ -153,7 +153,7 @@ function nextDue(f){if(f.mons&&f.mons.length)return nextMons(f);var t=td(),y=+t.
 function dl(c){return Math.round((new Date(c+'T00:00:00')-new Date(td()+'T00:00:00'))/864e5)}
 function dtxt(n){return n<0?'已逾期 '+(-n)+' 天':n===0?'今天到期':n+' 天後'}
 
-function hdr(){var n=new Date();document.getElementById('hd').innerHTML='<div class="hrow"><div class="logo">餘</div><div><div class="ttl">日日有餘</div><div class="tag">記一筆，離豬富自由更近一點</div></div></div><div class="dt"><b>'+(n.getMonth()+1)+'月'+n.getDate()+'日</b>週'+WD[(n.getDay()+6)%7]+'</div>'}
+function hdr(){var n=new Date();document.getElementById('hd').innerHTML='<div class="hrow"><div class="logo">餘</div><div><div class="ttl">日日有餘</div><div class="tag">記一筆，離退休人生更近一點</div></div></div><div class="dt"><b>'+(n.getMonth()+1)+'月'+n.getDate()+'日</b>週'+WD[(n.getDay()+6)%7]+'</div>'}
 function render(){hdr();
  function I(p){return '<span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true">'+p+'</svg></span>'}
  var T=[['home',I('<path d="M4 20l1-4L16.5 4.5a2 2 0 013 3L8 19l-4 1z"/><path d="M14 7l3 3"/>')+'記帳'],['mon',I('<path d="M5 20V10M12 20V4M19 20v-7"/>')+'月報'],['fix',I('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>')+'固定'],['bud',I('<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V12h8.5"/>')+'預算'],['as',I('<path d="M4 8V6.5A1.5 1.5 0 015.5 5H18"/><rect x="4" y="8" width="16" height="11" rx="2.5"/><circle cx="16" cy="13.5" r="1"/>')+'資產'],['more',I('<circle cx="6" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18" cy="12" r="1.2"/>')+'更多']];
