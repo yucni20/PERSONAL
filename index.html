@@ -84,6 +84,10 @@ nav .ic{font-size:19px;line-height:1.2}
 .dots{max-width:40px}
 @media (max-width:380px){.big{font-size:24px}.ttl{font-size:20px;letter-spacing:3px}.tag{font-size:11px;letter-spacing:0}.dt b{font-size:14px}.card{padding:12px}}
 body{overscroll-behavior-y:none}
+.item>div:first-child{flex:1;min-width:0}
+.bcol{display:flex;flex-direction:column;gap:6px;flex:none;width:84px}
+.bcol .sm,.bcol a.sm{width:100%;justify-content:center;text-align:center;padding:6px 4px;white-space:nowrap}
+.bcol .x{width:100%;min-height:30px;padding:0}
 .mch{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:4px}
 .mc{min-height:42px;padding:0;font-size:14px}
 .mc.on{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}
@@ -102,7 +106,7 @@ nav .ic svg{display:block;width:24px;height:24px;fill:none;stroke:currentColor;s
 <nav id="nav"></nav>
 <script>
 var CUR=['TWD','MOP','HKD','CNY','USD','EUR','JPY'];
-var CN={MOP:'澳門幣',HKD:'港幣',CNY:'人民幣',TWD:'台幣',USD:'美金',EUR:'歐元',JPY:'日圓'};
+var CN={TWD:'台幣',MOP:'澳門幣',HKD:'港幣',CNY:'人民幣',USD:'美金',EUR:'歐元',JPY:'日圓'};
 var INC=['薪資','獎金','股息','利息','租金','投資收益','其他收入'];
 var EXP=['餐飲','交通','居住','房貸','購物','娛樂','醫療','旅遊','保險','教育才藝','其他支出'];
 var AC=['現金／存款','股票','基金','儲蓄險','黃金','其他資產','房貸／負債'];
@@ -151,7 +155,7 @@ function mbar(){return '<div class="row sp" style="margin-bottom:10px"><button o
 function home(){
  var m=sel.slice(0,7),s=sums(m),net=s.i-s.e,ws=wkStart(sel),h='';
  var rm=S.fx.map(function(f,i){var c=nextDue(f);return{f:f,i:i,c:c,n:dl(c)}}).filter(function(x){return x.n<=7}).sort(function(a,b){return a.n-b.n});
- if(rm.length)h+='<div class="card warn"><b>🔔 收付提醒</b>'+rm.map(function(x){return '<div class="item"><div><div>'+esc(x.f.n)+'　'+fmt(x.f.a)+' '+x.f.c+'</div><div class="mut">'+x.c+'・'+dtxt(x.n)+'</div></div><button class="sm" onclick="payFx('+x.i+')">'+(x.f.t==='inc'?'已收':'已繳')+'</button></div>'}).join('')+'</div>';
+ if(rm.length)h+='<div class="card warn"><b>🔔 收付提醒</b>'+rm.map(function(x){return '<div class="item"><div><div>'+esc(x.f.n)+'　'+fmt(x.f.a)+' '+x.f.c+(x.f.c!==S.base?'　≈'+fmt(conv(x.f.a,x.f.c))+' '+S.base:'')+'</div><div class="mut">'+x.c+'・'+dtxt(x.n)+'</div></div><button class="sm" onclick="payFx('+x.i+')">'+(x.f.t==='inc'?'已收':'已繳')+'</button></div>'}).join('')+'</div>';
  h+='<div class="card"><div class="row sp"><span class="mut">'+m.replace('-',' 年 ')+' 月結餘（'+S.base+'）</span><span class="mut">收 <b class="inc">'+fmt(s.i)+'</b>　支 <b class="exp">'+fmt(s.e)+'</b></span></div><div class="big '+(net>=0?'inc':'exp')+'">'+(net>=0?'+':'')+sg(net)+'</div></div>';
  h+='<div class="card"><div class="row sp" style="margin-bottom:8px"><button class="sm" onclick="sel=addD(sel,-7);render()">‹ 上週</button><button class="sm" onclick="sel=td();render()">今天</button><button class="sm" onclick="sel=addD(sel,7);render()">下週 ›</button></div><div class="wk">';
  for(var i=0;i<7;i++){var d=addD(ws,i),l=S.tx.filter(function(t){return t.d===d}),dots=l.slice(0,8).map(function(t){return '<i class="dot '+t.t+'"></i>'}).join('')+(l.length>8?'<small>+</small>':'');
@@ -160,10 +164,10 @@ function home(){
  var cats=mode==='inc'?INC:EXP;
  h+='<div class="card"><div class="mut" style="margin-bottom:6px">選擇日期（週'+WD[(new Date(sel+'T00:00:00').getDay()+6)%7]+'）</div>'+dsel()+'<div class="seg"><button class="'+(mode==='exp'?'on':'')+'" onclick="mode=\'exp\';render()">支出</button><button class="'+(mode==='inc'?'on':'')+'" onclick="mode=\'inc\';render()">收入</button></div>'
  +'<div class="f"><input id="n" placeholder="買了什麼？例如：早餐、捷運、電影票"></div>'
- +'<div class="grid"><div class="f"><input id="a" type="number" inputmode="decimal" placeholder="金額"></div><div class="f"><select id="c">'+opts(CUR,S.last||'TWD')+'</select></div></div>'
+ +'<div class="grid"><div class="f"><input id="a" type="number" inputmode="decimal" placeholder="金額"></div><div class="f"><select id="c">'+opts(CUR,'MOP')+'</select></div></div>'
  +'<div class="f"><select id="k">'+opts(cats)+'</select></div><button class="pri" onclick="addTx()">記一筆</button></div>';
  var l=S.tx.filter(function(t){return t.d===sel}),dt=0;l.forEach(function(t){dt+=(t.t==='inc'?1:-1)*conv(t.a,t.c)});
- h+='<div class="card"><div class="row sp"><b>'+sel.slice(5).replace('-','/')+' 明細</b><span class="mut">當日 '+sg(dt)+'</span></div>'+(l.length?l.map(function(t){return '<div class="item"><div><div>'+esc(t.n||t.k)+'</div><div class="mut">'+esc(t.k)+'</div></div><div class="row"><span class="'+t.t+'">'+(t.t==='inc'?'+':'-')+fmt(t.a)+' '+t.c+'</span><button class="x" onclick="delTx('+t.id+')">✕</button></div></div>'}).join(''):'<div class="mut" style="margin-top:8px">這天還沒有紀錄</div>')+'</div>';
+ h+='<div class="card"><div class="row sp"><b>'+sel.slice(5).replace('-','/')+' 明細</b><span class="mut">當日 '+sg(dt)+'</span></div>'+(l.length?l.map(function(t){return '<div class="item"><div><div>'+esc(t.n||t.k)+'</div><div class="mut">'+esc(t.k)+'</div></div><div class="row"><span class="'+t.t+'">'+(t.t==='inc'?'+':'-')+fmt(t.a)+' '+t.c+(t.c!==S.base?'<br><small class="mut">≈ '+fmt(conv(t.a,t.c))+' '+S.base+'</small>':'')+'</span><button class="x" onclick="delTx('+t.id+')">✕</button></div></div>'}).join(''):'<div class="mut" style="margin-top:8px">這天還沒有紀錄</div>')+'</div>';
  return h;
 }
 function dsel(){var y=+sel.slice(0,4),m=+sel.slice(5,7),d=+sel.slice(8),dim=new Date(y,m,0).getDate(),Y=new Date().getFullYear(),a='',b='',c='',i;
@@ -199,12 +203,12 @@ function fix(){
  var tot=0,ti=0;S.fx.forEach(function(f){var v=conv(f.a,f.c)/(f.mons&&f.mons.length?12/f.mons.length:f.f==='y'?12:f.f==='q'?3:1);if(f.t==='inc')ti+=v;else tot+=v});
  var h='<h1>固定收支</h1><div class="card"><div class="grid"><div><div class="mut">每月平均固定收入</div><div class="big inc">'+fmt(ti)+'</div></div><div><div class="mut">每月平均固定支出</div><div class="big exp">'+fmt(tot)+'</div></div></div><div class="mut" style="margin-top:6px">'+S.base+'・每季、每年已攤成每月</div></div>';
  h+='<div class="card"><b>新增固定收支</b><div class="f" style="margin-top:8px"><label>名稱</label><input id="fn" placeholder="例如：房貸、鋼琴課、股息、租金"></div>'
- +'<div class="grid"><div class="f"><label>金額</label><input id="fa" type="number" inputmode="decimal"></div><div class="f"><label>幣別</label><select id="fc">'+opts(CUR,S.last||'TWD')+'</select></div>'
+ +'<div class="grid"><div class="f"><label>金額</label><input id="fa" type="number" inputmode="decimal"></div><div class="f"><label>幣別</label><select id="fc">'+opts(CUR,'MOP')+'</select></div>'
  +'<div class="f"><label>類型</label><select id="ft" onchange="document.getElementById(\'fk\').innerHTML=opts(this.value===\'inc\'?INC:EXP)"><option value="exp">支出（要繳的）</option><option value="inc">收入（股息、租金…）</option></select></div><div class="f"><label>分類</label><select id="fk">'+opts(EXP)+'</select></div><div class="f"><label>週期</label><select id="ff"><option value="m">每月</option><option value="q">每季</option><option value="y">每年</option></select></div>'
  +'<div class="f"><label>幾號繳</label><input id="fd" type="number" min="1" max="31"></div><div class="f" style="grid-column:1/-1"><label>月份（每季／每年才選，可點選多個）</label><input id="fm" type="hidden"><div class="mch">'+MCH()+'</div></div></div>'
  +'<button class="pri" onclick="addFx()">新增</button></div>';
  var l=S.fx.map(function(f,i){var c=nextDue(f);return{f:f,i:i,c:c,n:dl(c)}}).sort(function(a,b){return a.n-b.n});
- h+='<div class="card"><b>收付清單</b>'+(l.length?l.map(function(x){return '<div class="item"><div><div>'+esc(x.f.n)+'　'+fmt(x.f.a)+' '+x.f.c+'</div><div class="mut">'+FL(x.f)+(x.f.mons&&x.f.mons.length?'（'+x.f.mons.join('、')+'月）':'')+'・'+esc(x.f.k)+'・下次 '+x.c+'（'+dtxt(x.n)+'）</div></div><div class="row"><a class="sm" style="display:inline-flex;align-items:center;text-decoration:none;border-radius:10px" target="_blank" rel="noopener noreferrer" href="'+esc(gcalUrl(x.i))+'">📅 行事曆</a><button class="sm" onclick="payFx('+x.i+')">'+(x.f.t==='inc'?'已收':'已繳')+'</button><button class="x" onclick="delFx('+x.i+')">✕</button></div></div>'}).join(''):'<div class="mut" style="margin-top:8px">還沒有項目</div>')+'</div>';
+ h+='<div class="card"><b>收付清單</b>'+(l.length?l.map(function(x){return '<div class="item"><div><div>'+esc(x.f.n)+'　'+fmt(x.f.a)+' '+x.f.c+(x.f.c!==S.base?'　≈'+fmt(conv(x.f.a,x.f.c))+' '+S.base:'')+'</div><div class="mut">'+FL(x.f)+(x.f.mons&&x.f.mons.length?'（'+x.f.mons.join('、')+'月）':'')+'・'+esc(x.f.k)+'・下次 '+x.c+'（'+dtxt(x.n)+'）</div></div><div class="bcol"><a class="sm" style="display:inline-flex;align-items:center;text-decoration:none;border-radius:10px" target="_blank" rel="noopener noreferrer" href="'+esc(gcalUrl(x.i))+'">📅 行事曆</a><button class="sm" onclick="payFx('+x.i+')">'+(x.f.t==='inc'?'已收':'已繳')+'</button><button class="x" onclick="delFx('+x.i+')">✕</button></div></div>'}).join(''):'<div class="mut" style="margin-top:8px">還沒有項目</div>')+'</div>';
  return h+'<div class="mut">按「已繳／已收」會自動記一筆支出或收入，並跳到下一個日期。</div>';
 }
 function MCH(){var r='';for(var i=1;i<=12;i++)r+='<button type="button" class="mc" onclick="tgM(this)">'+i+'月</button>';return r}
