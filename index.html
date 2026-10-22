@@ -116,9 +116,10 @@ function td(){return ds(new Date())}
 function addD(s,n){var d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return ds(d)}
 function wkStart(s){var d=new Date(s+'T00:00:00');return addD(s,-((d.getDay()+6)%7))}
 var sel=td(),month=td().slice(0,7);
-function load(d){S.tx=d.tx||[];S.as=d.as||[];S.fx=d.fx||[];S.bud=d.bud||{};S.bm=d.bm||{};S.snaps=d.snaps||[];S.base=d.base||'TWD';Object.assign(S.rates,d.rates||{})}
+function load(d){S.upd=d.upd||0;S.tx=d.tx||[];S.as=d.as||[];S.fx=d.fx||[];S.bud=d.bud||{};S.bm=d.bm||{};S.snaps=d.snaps||[];S.base=d.base||'TWD';Object.assign(S.rates,d.rates||{})}
 try{var raw=localStorage.getItem(KEY);if(raw)load(JSON.parse(raw))}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){S.upd=Date.now();saveLocal();fbPush()}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function conv(a,c){return a*S.rates[c]/S.rates[S.base]}
 function fmt(n){return Math.round(n).toLocaleString('en-US')}
@@ -129,8 +130,8 @@ function sums(m){var i=0,e=0,cat={};mt(m).forEach(function(t){var v=conv(t.a,t.c
 function shift(n){var p=month.split('-'),d=new Date(+p[0],+p[1]-1+n,1);month=d.getFullYear()+'-'+pad(d.getMonth()+1);render()}
 function getBud(m,k){var b=S.bm[m];return b&&b[k]!=null?b[k]:(S.bud[k]||0)}
 function worth(){var a=0,l=0,by={};S.as.forEach(function(x){var v=conv(x.v,x.c);if(x.k==='房貸／負債')l+=v;else a+=v;by[x.k]=(by[x.k]||0)+v});return{a:a,l:l,by:by}}
-function snap(){if(!S.as.length)return;var w=worth(),r=S.rates[S.base],t=td(),o={d:t,nw:(w.a-w.l)*r,a:w.a*r,l:w.l*r};
- var i=S.snaps.findIndex(function(x){return x.d===t});if(i>=0)S.snaps[i]=o;else S.snaps.push(o);save()}
+function snap(f){if(!S.as.length)return;var w=worth(),r=S.rates[S.base],t=td(),o={d:t,nw:(w.a-w.l)*r,a:w.a*r,l:w.l*r};
+ var i=S.snaps.findIndex(function(x){return x.d===t});if(i>=0)S.snaps[i]=o;else S.snaps.push(o);saveLocal();if(f){save()}}
 function mk(y,m,d){y+=Math.floor((m-1)/12);m=((m-1)%12+12)%12+1;d=Math.min(d,new Date(y,m,0).getDate());return y+'-'+pad(m)+'-'+pad(d)}
 function nextMons(f){var t=td(),y=+t.slice(0,4),ym=t.slice(0,7),L=[],c=0,i;for(var yy=y-1;yy<=y+1;yy++)f.mons.forEach(function(mm){L.push(mk(yy,mm,f.day))});L.sort();for(i=0;i<L.length;i++)if(L[i].slice(0,7)<=ym)c=i;if(f.last)while(c<L.length-1&&L[c]<=f.last)c++;return L[c]}
 function nextDue(f){if(f.mons&&f.mons.length)return nextMons(f);var t=td(),y=+t.slice(0,4),m=+t.slice(5,7),st=f.f==='q'?3:1,a=f.f==='m'?m:f.mon,mq=m-(((m-a)%st)+st)%st,c=f.f==='y'?mk(y,f.mon,f.day):mk(y,mq,f.day);
@@ -252,9 +253,9 @@ function assets(){
  return h;
 }
 function addAs(){var v=parseFloat(document.getElementById('av').value),n=document.getElementById('an').value.trim();if(!n||isNaN(v)){alert('請填名稱與金額');return}
- S.as.push({n:n,k:document.getElementById('ak').value,c:document.getElementById('ac').value,v:v});snap();render()}
-function upAs(i,v){S.as[i].v=parseFloat(v)||0;snap();render()}
-function delAs(i){S.as.splice(i,1);snap();render()}
+ S.as.push({n:n,k:document.getElementById('ak').value,c:document.getElementById('ac').value,v:v});snap(1);render()}
+function upAs(i,v){S.as[i].v=parseFloat(v)||0;snap(1);render()}
+function delAs(i){S.as.splice(i,1);snap(1);render()}
 
 function R(n){return Math.round(n*100)/100}
 function sheet(rows,wd){var w=XLSX.utils.aoa_to_sheet(rows);w['!cols']=wd.map(function(x){return{wch:x}});return w}
@@ -275,13 +276,67 @@ async function exportXlsx(){
 }
 function more(){
  var s=sums(month);
- return '<h1>更多</h1>'+mbar()+'<div class="card"><b>Excel 月報表</b><div class="mut" style="margin:4px 0 10px">'+month+'：收入 '+fmt(s.i)+'・支出 '+fmt(s.e)+'・'+mt(month).length+' 筆。含摘要、明細、分類與預算、資產負債、固定支出五張工作表。</div><button class="pri" onclick="exportXlsx()">下載 Excel（.xlsx）</button></div>'
+ return '<h1>更多</h1>'+fbCard()+mbar()+'<div class="card"><b>Excel 月報表</b><div class="mut" style="margin:4px 0 10px">'+month+'：收入 '+fmt(s.i)+'・支出 '+fmt(s.e)+'・'+mt(month).length+' 筆。含摘要、明細、分類與預算、資產負債、固定支出五張工作表。</div><button class="pri" onclick="exportXlsx()">下載 Excel（.xlsx）</button></div>'
  +'<div class="card"><div class="f"><label>總覽顯示幣別</label><select onchange="S.base=this.value;save();render()">'+opts(CUR,S.base)+'</select></div></div>'
  +'<div class="card"><b>匯率（1 單位 = 多少台幣）</b><div class="mut">預設為概略值，請依實際匯率修改</div><div class="grid" style="margin-top:8px">'+CUR.filter(function(c){return c!=='TWD'}).map(function(c){return '<div class="f"><label>'+c+' '+CN[c]+'</label><input type="number" step="any" value="'+S.rates[c]+'" onchange="S.rates[\''+c+'\']=parseFloat(this.value)||1;save()"></div>'}).join('')+'</div></div>'
  +'<div class="card"><b>備份</b><div class="mut">資料只存在這個瀏覽器，請定期備份。</div><textarea id="bk" style="width:100%;height:70px;margin-top:8px"></textarea><div class="grid" style="margin-top:8px"><button onclick="document.getElementById(\'bk\').value=JSON.stringify(S)">產生備份文字</button><button onclick="restore()">貼上並還原</button></div></div>';
 }
+var FBK='ledger-fb',FB={cfg:null,uid:null,db:null,st:'未登入',t:null,un:null,p:null};
+try{FB.cfg=JSON.parse(localStorage.getItem(FBK)||'null')}catch(e){}
+function fbLoad(src){return new Promise(function(ok,no){var s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=function(){no(new Error('無法載入 '+src))};document.head.appendChild(s)})}
+function fbSt(t){FB.st=t;var e=document.getElementById('fbst');if(e)e.textContent=t}
+function fbInit(){if(!FB.cfg)return;FB.p=fbBoot();return FB.p}
+async function fbBoot(){
+ try{
+  var B='https://www.gstatic.com/firebasejs/10.12.2/';
+  if(!window.firebase){await fbLoad(B+'firebase-app-compat.js');await fbLoad(B+'firebase-auth-compat.js');await fbLoad(B+'firebase-firestore-compat.js')}
+  if(!firebase.apps.length)firebase.initializeApp(FB.cfg);
+  FB.db=firebase.firestore();
+  firebase.auth().onAuthStateChanged(function(u){
+   if(u){FB.uid=u.uid;fbSt('已登入：'+(u.email||''));fbPull()}
+   else{FB.uid=null;if(FB.un){FB.un();FB.un=null}fbSt('未登入')}
+   if(tab==='more')render()});
+ }catch(e){fbSt('雲端載入失敗：'+(e.message||e));throw e}
+}
+function fbRef(){return FB.db.collection('users').doc(FB.uid).collection('app').doc('ledger')}
+async function fbPutNow(){if(!S.upd)S.upd=Date.now();await fbRef().set({json:JSON.stringify(S),upd:S.upd});saveLocal()}
+async function fbPull(){
+ if(!FB.uid||!FB.db)return;
+ try{
+  fbSt('同步中…');
+  var d=await fbRef().get(),l=S.upd||0;
+  if(d.exists){var r=d.data(),ru=r.upd||0;
+   if(ru>l){load(JSON.parse(r.json));S.upd=ru;saveLocal();render()}
+   else if(ru<l){await fbPutNow()}
+  }else{await fbPutNow()}
+  fbSt('已同步 '+new Date().toLocaleTimeString());fbListen();
+ }catch(e){fbSt('同步失敗：'+(e.code||e.message))}
+}
+function fbListen(){if(FB.un||!FB.uid)return;
+ FB.un=fbRef().onSnapshot(function(d){if(!d.exists||d.metadata.hasPendingWrites)return;var r=d.data();
+  if((r.upd||0)>(S.upd||0)){load(JSON.parse(r.json));S.upd=r.upd;saveLocal();render();fbSt('已從雲端更新 '+new Date().toLocaleTimeString())}})}
+function fbPush(){if(!FB.uid||!FB.db)return;clearTimeout(FB.t);fbSt('同步中…');
+ FB.t=setTimeout(function(){fbPutNow().then(function(){fbSt('已同步 '+new Date().toLocaleTimeString())}).catch(function(e){fbSt('同步失敗：'+(e.code||e.message))})},1200)}
+function fbSaveCfg(){var t=document.getElementById('fbcfg').value,c={},m,re=/(\w+)\s*:\s*["']([^"']+)["']/g;
+ while((m=re.exec(t)))c[m[1]]=m[2];
+ if(!c.apiKey||!c.projectId){alert('設定不完整，請把 Firebase 的 firebaseConfig 整段貼上（要有 apiKey 和 projectId）');return}
+ try{localStorage.setItem(FBK,JSON.stringify(c))}catch(e){}
+ location.reload()}
+async function fbAuth(m){var e=document.getElementById('fbe').value.trim(),p=document.getElementById('fbp').value;
+ if(!e||p.length<6){alert('請輸入 Email 與至少 6 碼的密碼');return}
+ try{await FB.p;var a=firebase.auth();if(m==='up')await a.createUserWithEmailAndPassword(e,p);else await a.signInWithEmailAndPassword(e,p)}
+ catch(x){alert('失敗：'+(x.code||x.message)+'\n請確認 Firebase 已開啟「電子郵件/密碼」登入，且網站網域已加入授權網域。')}}
+function fbOut(){if(FB.un){FB.un();FB.un=null}try{firebase.auth().signOut()}catch(e){}}
+function fbReset(){if(!confirm('要移除雲端設定嗎？手機上的資料不會被刪除。'))return;try{localStorage.removeItem(FBK)}catch(e){}location.reload()}
+function fbCard(){var h='<div class="card"><b>☁️ 雲端同步</b>';
+ if(!FB.cfg)return h+'<div class="mut" style="margin:4px 0 8px">貼上你的 Firebase 設定（firebaseConfig）後，資料會自動存到雲端，關掉網頁、換手機都不會不見。</div><textarea id="fbcfg" style="width:100%;height:110px;font-size:13px" placeholder="貼上整段 firebaseConfig，要有 apiKey、projectId…"></textarea><button class="pri" style="margin-top:8px" onclick="fbSaveCfg()">儲存設定</button></div>';
+ h+='<div class="mut" id="fbst" style="margin:4px 0 10px">'+esc(FB.st)+'</div>';
+ if(FB.uid)h+='<div class="grid"><button onclick="fbPull()">立即同步</button><button onclick="fbOut()">登出</button></div>';
+ else h+='<div class="f"><input id="fbe" type="email" placeholder="Email" autocomplete="username"></div><div class="f"><input id="fbp" type="password" placeholder="密碼（至少 6 碼）" autocomplete="current-password"></div><div class="grid"><button class="pri" onclick="fbAuth(\'in\')">登入</button><button onclick="fbAuth(\'up\')">第一次：註冊</button></div>';
+ return h+'<div style="margin-top:10px"><button class="sm" onclick="fbReset()">重設雲端設定</button></div></div>'}
 function restore(){try{load(JSON.parse(document.getElementById('bk').value));save();render()}catch(e){alert('備份格式不正確')}}
-snap();render();
+if(!S.upd&&(S.tx.length||S.as.length||S.fx.length))S.upd=Date.now();
+snap();render();fbInit();
 </script>
 </body>
 </html>
