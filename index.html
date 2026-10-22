@@ -84,6 +84,9 @@ nav .ic{font-size:19px;line-height:1.2}
 .dots{max-width:40px}
 @media (max-width:380px){.big{font-size:24px}.ttl{font-size:20px;letter-spacing:3px}.tag{font-size:11px;letter-spacing:0}.dt b{font-size:14px}.card{padding:12px}}
 body{overscroll-behavior-y:none}
+.mch{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:4px}
+.mc{min-height:42px;padding:0;font-size:14px}
+.mc.on{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}
 nav{left:50%;right:auto;width:100%;max-width:480px;transform:translateX(-50%);border-radius:18px 18px 0 0}
 @media (min-width:600px){html{background:#e0d8ce}body{max-width:480px;margin:0 auto;min-height:100vh;box-shadow:0 0 40px #00000022}}
 @media (min-width:600px) and (prefers-color-scheme:dark){html{background:#161312}}
@@ -197,12 +200,14 @@ function fix(){
  h+='<div class="card"><b>新增固定收支</b><div class="f" style="margin-top:8px"><label>名稱</label><input id="fn" placeholder="例如：房貸、鋼琴課、股息、租金"></div>'
  +'<div class="grid"><div class="f"><label>金額</label><input id="fa" type="number" inputmode="decimal"></div><div class="f"><label>幣別</label><select id="fc">'+opts(CUR,S.last||'TWD')+'</select></div>'
  +'<div class="f"><label>類型</label><select id="ft" onchange="document.getElementById(\'fk\').innerHTML=opts(this.value===\'inc\'?INC:EXP)"><option value="exp">支出（要繳的）</option><option value="inc">收入（股息、租金…）</option></select></div><div class="f"><label>分類</label><select id="fk">'+opts(EXP)+'</select></div><div class="f"><label>週期</label><select id="ff"><option value="m">每月</option><option value="q">每季</option><option value="y">每年</option></select></div>'
- +'<div class="f"><label>幾號繳</label><input id="fd" type="number" min="1" max="31"></div><div class="f"><label>月份（每季／每年才填，可填多個）</label><input id="fm" inputmode="numeric" placeholder="例如 3,6,9,12"></div></div>'
+ +'<div class="f"><label>幾號繳</label><input id="fd" type="number" min="1" max="31"></div><div class="f" style="grid-column:1/-1"><label>月份（每季／每年才選，可點選多個）</label><input id="fm" type="hidden"><div class="mch">'+MCH()+'</div></div></div>'
  +'<button class="pri" onclick="addFx()">新增</button></div>';
  var l=S.fx.map(function(f,i){var c=nextDue(f);return{f:f,i:i,c:c,n:dl(c)}}).sort(function(a,b){return a.n-b.n});
  h+='<div class="card"><b>收付清單</b>'+(l.length?l.map(function(x){return '<div class="item"><div><div>'+esc(x.f.n)+'　'+fmt(x.f.a)+' '+x.f.c+'</div><div class="mut">'+FL(x.f)+(x.f.mons&&x.f.mons.length?'（'+x.f.mons.join('、')+'月）':'')+'・'+esc(x.f.k)+'・下次 '+x.c+'（'+dtxt(x.n)+'）</div></div><div class="row"><a class="sm" style="display:inline-flex;align-items:center;text-decoration:none;border-radius:10px" target="_blank" rel="noopener noreferrer" href="'+esc(gcalUrl(x.i))+'">📅 行事曆</a><button class="sm" onclick="payFx('+x.i+')">'+(x.f.t==='inc'?'已收':'已繳')+'</button><button class="x" onclick="delFx('+x.i+')">✕</button></div></div>'}).join(''):'<div class="mut" style="margin-top:8px">還沒有項目</div>')+'</div>';
  return h+'<div class="mut">按「已繳／已收」會自動記一筆支出或收入，並跳到下一個日期。</div>';
 }
+function MCH(){var r='';for(var i=1;i<=12;i++)r+='<button type="button" class="mc" onclick="tgM(this)">'+i+'月</button>';return r}
+function tgM(b){b.classList.toggle('on');var v=[].slice.call(document.querySelectorAll('.mc.on')).map(function(x){return parseInt(x.textContent)});document.getElementById('fm').value=v.join(',')}
 function addFx(){var n=document.getElementById('fn').value.trim(),a=parseFloat(document.getElementById('fa').value),fq=document.getElementById('ff').value,y=fq!=='m',
  d=parseInt(document.getElementById('fd').value),ms=(document.getElementById('fm').value.match(/\d+/g)||[]).map(Number).filter(function(x){return x>=1&&x<=12}).filter(function(x,i,a){return a.indexOf(x)===i}).sort(function(a,b){return a-b}),m=ms[0];
  if(!n||!(a>0)||!(d>=1&&d<=31)||(y&&!(m>=1&&m<=12))){alert('請填寫名稱、金額、繳費日（每季、每年要填月份）');return}
