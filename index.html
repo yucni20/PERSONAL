@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>日日有餘</title>
+<!-- v: line-icon nav -->
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f1ede8;--card:#faf8f5;--tx:#4a4543;--mut:#9a918a;--bd:#e4ddd4;--ac:#8e7f93;--exp:#b97f78;--inc:#7c97a8;--soft:#e9e3dc;--sage:#9fb3a3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#262322;--card:#322e2d;--tx:#ece6e0;--mut:#a39a93;--bd:#46403d;--ac:#b3a3b8;--exp:#d49b94;--inc:#9ab5c6;--soft:#3d3836;--sage:#a9bdad}}
+:root[data-theme="dark"]{--bg:#262322;--card:#322e2d;--tx:#ece6e0;--mut:#a39a93;--bd:#46403d;--ac:#b3a3b8;--exp:#d49b94;--inc:#9ab5c6;--soft:#3d3836;--sage:#a9bdad}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 -apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
+main{max-width:640px;margin:0 auto;padding:12px 14px 90px}
+h1{font-size:18px;margin:4px 0 12px;font-weight:600}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:12px}
+.big{font-size:28px;font-weight:700;letter-spacing:-.5px}
+.inc{color:var(--inc)}.exp{color:var(--exp)}.mut{color:var(--mut);font-size:13px}
+.row{display:flex;gap:8px;align-items:center}.sp{justify-content:space-between}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input,select,button,textarea{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:9px 10px;min-width:0}
+input,select{width:100%}
+button{cursor:pointer}
+.pri{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600;width:100%}
+:root[data-theme="dark"] .pri{color:#262322}
+.sm{padding:5px 10px;font-size:13px;background:var(--soft);border-color:var(--soft);color:var(--ac);font-weight:600}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--bd);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;border:0;border-radius:0;background:none;padding:12px 0;color:var(--mut);font-size:13px}
+nav button.on{color:var(--ac);font-weight:700}
+.seg{display:flex;gap:6px;margin-bottom:10px}
+.seg button{flex:1}.seg button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.item{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px solid var(--bd)}
+.item:last-child{border:0}
+.bar{height:8px;border-radius:4px;background:var(--soft);margin-top:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--sage)}
+.x{border:0;background:none;color:var(--mut);padding:2px 6px}
+label{font-size:12px;color:var(--mut)}
+.f{margin-bottom:8px}
+.warn{background:var(--soft)}
+.wk{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.wk button{display:flex;flex-direction:column;align-items:center;padding:7px 0 6px;border-radius:12px;background:none;border:1px solid transparent;min-height:68px}
+.wk button.sel{background:var(--ac);color:#fff}
+:root[data-theme="dark"] .wk button.sel{color:#262322}
+.wk button.tod .dn{text-decoration:underline}
+.wk small{font-size:11px;opacity:.7}.dn{font-size:17px;font-weight:600}
+.dots{display:flex;flex-wrap:wrap;justify-content:center;gap:3px;margin-top:4px;min-height:14px;max-width:34px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--exp)}
+.dot.inc{background:var(--inc)}
+.wk button.sel .dot{box-shadow:0 0 0 1.5px #fff8}
+header{max-width:640px;margin:0 auto;padding:16px 14px 0;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.hrow{display:flex;gap:11px;align-items:center}
+.logo{width:42px;height:42px;flex:none;border-radius:50%;background:linear-gradient(135deg,#d3b8b2,#8e7f93);color:#fff;display:flex;align-items:center;justify-content:center;font:600 20px "Noto Serif TC","Songti TC",PMingLiU,serif}
+.ttl{font:600 23px/1.2 "Noto Serif TC","Songti TC",PMingLiU,serif;letter-spacing:5px}
+.tag{font-size:12px;color:var(--mut);letter-spacing:1px;margin-top:2px}
+.dt{text-align:right;font-size:12px;color:var(--mut);line-height:1.4;white-space:nowrap}
+.dt b{display:block;font-size:15px;color:var(--ac);font-weight:600}
+html{-webkit-text-size-adjust:100%}
+body{font-size:16px;line-height:1.6;-webkit-tap-highlight-color:transparent}
+main{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+input,select,textarea{font-size:16px;min-height:46px}
+button{min-height:44px;touch-action:manipulation}
+button:active{transform:scale(.97)}
+.sm{min-height:38px;padding:6px 14px}
+.x{min-width:42px;min-height:42px;font-size:16px}
+.pri{min-height:50px;font-size:17px;border-radius:14px}
+.seg button{min-height:46px}
+.mut{font-size:13.5px}
+label{font-size:13px}
+.item{padding:12px 0}
+.item .row{flex:none}
+nav{box-shadow:0 -4px 16px #0000000d}
+nav button{display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 0 7px;font-size:12px;min-height:56px}
+nav .ic{font-size:19px;line-height:1.2}
+.wk button{min-height:76px}
+.wk .dn{font-size:19px}
+.wk small{font-size:12px}
+.dot{width:7px;height:7px}
+.dots{max-width:40px}
+@media (max-width:380px){.big{font-size:24px}.ttl{font-size:20px;letter-spacing:3px}.tag{font-size:11px;letter-spacing:0}.dt b{font-size:14px}.card{padding:12px}}
+@media (min-width:700px){main,header{max-width:560px}}
+nav button{justify-content:center;gap:3px;line-height:1.2}
+nav .ic{display:block;width:24px;height:24px;font-size:0;line-height:0}
+nav .ic svg{display:block;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+<header id="hd"></header>
+<main id="app"></main>
+<nav id="nav"></nav>
+<script>
+var CUR=['TWD','MOP','HKD','CNY','USD','EUR','JPY'];
+var CN={TWD:'台幣',MOP:'澳門幣',HKD:'港幣',CNY:'人民幣',USD:'美金',EUR:'歐元',JPY:'日圓'};
+var INC=['薪資','獎金','投資收益','其他收入'];
+var EXP=['餐飲','交通','居住','房貸','購物','娛樂','醫療','旅遊','保險','教育才藝','其他支出'];
+var AC=['現金／存款','股票','基金','儲蓄險','黃金','其他資產','房貸／負債'];
+var PAL=['#c9908a','#8fa3b0','#a99bb0','#a3b1a0','#d3b896','#b5a393'];
+var WD=['一','二','三','四','五','六','日'];
+var S={tx:[],as:[],fx:[],bud:{},bm:{},snaps:[],base:'TWD',rates:{TWD:1,MOP:4,HKD:4.1,CNY:4.4,USD:31.5,EUR:36,JPY:0.21}};
+var KEY='ledger-v1',tab='home',mode='exp';
+function pad(n){return String(n).padStart(2,'0')}
+function ds(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function td(){return ds(new Date())}
+function addD(s,n){var d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return ds(d)}
+function wkStart(s){var d=new Date(s+'T00:00:00');return addD(s,-((d.getDay()+6)%7))}
+var sel=td(),month=td().slice(0,7);
+function load(d){S.tx=d.tx||[];S.as=d.as||[];S.fx=d.fx||[];S.bud=d.bud||{};S.bm=d.bm||{};S.snaps=d.snaps||[];S.base=d.base||'TWD';Object.assign(S.rates,d.rates||{})}
+try{var raw=localStorage.getItem(KEY);if(raw)load(JSON.parse(raw))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function conv(a,c){return a*S.rates[c]/S.rates[S.base]}
+function fmt(n){return Math.round(n).toLocaleString('en-US')}
+function sg(n){return (n<0?'-':'')+fmt(Math.abs(n))}
+function opts(a,sel){return a.map(function(x){return '<option value="'+x+'"'+(x===sel?' selected':'')+'>'+(CN[x]?x+' '+CN[x]:x)+'</option>'}).join('')}
+function mt(m){return S.tx.filter(function(t){return t.d.slice(0,7)===m})}
+function sums(m){var i=0,e=0,cat={};mt(m).forEach(function(t){var v=conv(t.a,t.c);if(t.t==='inc')i+=v;else{e+=v;cat[t.k]=(cat[t.k]||0)+v}});return{i:i,e:e,cat:cat}}
+function shift(n){var p=month.split('-'),d=new Date(+p[0],+p[1]-1+n,1);month=d.getFullYear()+'-'+pad(d.getMonth()+1);render()}
+function getBud(m,k){var b=S.bm[m];return b&&b[k]!=null?b[k]:(S.bud[k]||0)}
+function worth(){var a=0,l=0,by={};S.as.forEach(function(x){var v=conv(x.v,x.c);if(x.k==='房貸／負債')l+=v;else a+=v;by[x.k]=(by[x.k]||0)+v});return{a:a,l:l,by:by}}
+function snap(){if(!S.as.length)return;var w=worth(),r=S.rates[S.base],t=td(),o={d:t,nw:(w.a-w.l)*r,a:w.a*r,l:w.l*r};
+ var i=S.snaps.findIndex(function(x){return x.d===t});if(i>=0)S.snaps[i]=o;else S.snaps.push(o);save()}
+function mk(y,m,d){y+=Math.floor((m-1)/12);m=((m-1)%12+12)%12+1;d=Math.min(d,new Date(y,m,0).getDate());return y+'-'+pad(m)+'-'+pad(d)}
+function nextDue(f){var t=td(),y=+t.slice(0,4),m=+t.slice(5,7),c=f.f==='m'?mk(y,m,f.day):mk(y,f.mon,f.day);
+ if(f.last&&c<=f.last)c=f.f==='m'?mk(y,m+1,f.day):mk(y+1,f.mon,f.day);return c}
+function dl(c){return Math.round((new Date(c+'T00:00:00')-new Date(td()+'T00:00:00'))/864e5)}
+function dtxt(n){return n<0?'已逾期 '+(-n)+' 天':n===0?'今天到期':n+' 天後'}
+
+function hdr(){var n=new Date();document.getElementById('hd').innerHTML='<div class="hrow"><div class="logo">餘</div><div><div class="ttl">日日有餘</div><div class="tag">記一筆，離豬富自由更近一點</div></div></div><div class="dt"><b>'+(n.getMonth()+1)+'月'+n.getDate()+'日</b>週'+WD[(n.getDay()+6)%7]+'</div>'}
+function render(){hdr();
+ function I(p){return '<span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true">'+p+'</svg></span>'}
+ var T=[['home',I('<path d="M4 20l1-4L16.5 4.5a2 2 0 013 3L8 19l-4 1z"/><path d="M14 7l3 3"/>')+'記帳'],['mon',I('<path d="M5 20V10M12 20V4M19 20v-7"/>')+'月報'],['fix',I('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>')+'固定'],['bud',I('<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V12h8.5"/>')+'預算'],['as',I('<path d="M4 8V6.5A1.5 1.5 0 015.5 5H18"/><rect x="4" y="8" width="16" height="11" rx="2.5"/><circle cx="16" cy="13.5" r="1"/>')+'資產'],['more',I('<circle cx="6" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18" cy="12" r="1.2"/>')+'更多']];
+ document.getElementById('nav').innerHTML=T.map(function(t){return '<button class="'+(tab===t[0]?'on':'')+'" onclick="tab=\''+t[0]+'\';render()">'+t[1]+'</button>'}).join('');
+ document.getElementById('app').innerHTML={home:home,mon:mon,fix:fix,bud:bud,as:assets,more:more}[tab]();
+}
+function mbar(){return '<div class="row sp" style="margin-bottom:10px"><button onclick="shift(-1)">‹</button><b>'+month.replace('-',' 年 ')+' 月</b><button onclick="shift(1)">›</button></div>'}
+
+function home(){
+ var m=sel.slice(0,7),s=sums(m),net=s.i-s.e,ws=wkStart(sel),h='';
+ var rm=S.fx.map(function(f,i){var c=nextDue(f);return{f:f,i:i,c:c,n:dl(c)}}).filter(function(x){return x.n<=7}).sort(function(a,b){return a.n-b.n});
+ if(rm.length)h+='<div class="card warn"><b>🔔 繳費提醒</b>'+rm.map(function(x){return '<div class="item"><div><div>'+esc(x.f.n)+'　'+fmt(x.f.a)+' '+x.f.c+'</div><div class="mut">'+x.c+'・'+dtxt(x.n)+'</div></div><button class="sm" onclick="payFx('+x.i+')">已繳</button></div>'}).join('')+'</div>';
+ h+='<div class="card"><div class="row sp"><span class="mut">'+m.replace('-',' 年 ')+' 月結餘（'+S.base+'）</span><span class="mut">收 <b class="inc">'+fmt(s.i)+'</b>　支 <b class="exp">'+fmt(s.e)+'</b></span></div><div class="big '+(net>=0?'inc':'exp')+'">'+(net>=0?'+':'')+sg(net)+'</div></div>';
+ h+='<div class="card"><div class="row sp" style="margin-bottom:8px"><button class="sm" onclick="sel=addD(sel,-7);render()">‹ 上週</button><button class="sm" onclick="sel=td();render()">今天</button><button class="sm" onclick="sel=addD(sel,7);render()">下週 ›</button></div><div class="wk">';
+ for(var i=0;i<7;i++){var d=addD(ws,i),l=S.tx.filter(function(t){return t.d===d}),dots=l.slice(0,8).map(function(t){return '<i class="dot '+t.t+'"></i>'}).join('')+(l.length>8?'<small>+</small>':'');
+  h+='<button class="'+(d===sel?'sel ':'')+(d===td()?'tod':'')+'" onclick="sel=\''+d+'\';render()"><small>'+WD[i]+'</small><span class="dn">'+(+d.slice(8))+'</span><span class="dots">'+dots+'</span></button>'}
+ h+='</div></div>';
+ var cats=mode==='inc'?INC:EXP;
+ h+='<div class="card"><div class="mut" style="margin-bottom:6px">選擇日期（週'+WD[(new Date(sel+'T00:00:00').getDay()+6)%7]+'）</div>'+dsel()+'<div class="seg"><button class="'+(mode==='exp'?'on':'')+'" onclick="mode=\'exp\';render()">支出</button><button class="'+(mode==='inc'?'on':'')+'" onclick="mode=\'inc\';render()">收入</button></div>'
+ +'<div class="f"><input id="n" placeholder="買了什麼？例如：早餐、捷運、電影票"></div>'
+ +'<div class="grid"><div class="f"><input id="a" type="number" inputmode="decimal" placeholder="金額"></div><div class="f"><select id="c">'+opts(CUR,S.last||'TWD')+'</select></div></div>'
+ +'<div class="f"><select id="k">'+opts(cats)+'</select></div><button class="pri" onclick="addTx()">記一筆</button></div>';
+ var l=S.tx.filter(function(t){return t.d===sel}),dt=0;l.forEach(function(t){dt+=(t.t==='inc'?1:-1)*conv(t.a,t.c)});
+ h+='<div class="card"><div class="row sp"><b>'+sel.slice(5).replace('-','/')+' 明細</b><span class="mut">當日 '+sg(dt)+'</span></div>'+(l.length?l.map(function(t){return '<div class="item"><div><div>'+esc(t.n||t.k)+'</div><div class="mut">'+esc(t.k)+'</div></div><div class="row"><span class="'+t.t+'">'+(t.t==='inc'?'+':'-')+fmt(t.a)+' '+t.c+'</span><button class="x" onclick="delTx('+t.id+')">✕</button></div></div>'}).join(''):'<div class="mut" style="margin-top:8px">這天還沒有紀錄</div>')+'</div>';
+ return h;
+}
+function dsel(){var y=+sel.slice(0,4),m=+sel.slice(5,7),d=+sel.slice(8),dim=new Date(y,m,0).getDate(),Y=new Date().getFullYear(),a='',b='',c='',i;
+ for(i=Y-5;i<=Y+1;i++)a+='<option value="'+i+'"'+(i===y?' selected':'')+'>'+i+' 年</option>';
+ for(i=1;i<=12;i++)b+='<option value="'+i+'"'+(i===m?' selected':'')+'>'+i+' 月</option>';
+ for(i=1;i<=dim;i++)c+='<option value="'+i+'"'+(i===d?' selected':'')+'>'+i+' 日</option>';
+ return '<div class="row" style="margin-bottom:10px"><select id="dy" onchange="setD()">'+a+'</select><select id="dm" onchange="setD()">'+b+'</select><select id="dd" onchange="setD()">'+c+'</select></div>'}
+function setD(){var n=document.getElementById('n').value,a=document.getElementById('a').value,y=+document.getElementById('dy').value,m=+document.getElementById('dm').value,d=Math.min(+document.getElementById('dd').value,new Date(y,m,0).getDate());
+ sel=y+'-'+pad(m)+'-'+pad(d);month=sel.slice(0,7);render();document.getElementById('n').value=n;document.getElementById('a').value=a}
+function addTx(){
+ var a=parseFloat(document.getElementById('a').value);if(!(a>0)){alert('請輸入金額');return}
+ var c=document.getElementById('c').value,k=document.getElementById('k').value;
+ S.last=c;S.tx.push({id:Date.now(),t:mode,a:a,c:c,k:k,d:sel,n:document.getElementById('n').value.trim()||k});
+ month=sel.slice(0,7);save();render();
+}
+function delTx(id){S.tx=S.tx.filter(function(t){return t.id!==id});save();render()}
+
+function mon(){
+ var s=sums(month),net=s.i-s.e,w=worth();
+ var cats=Object.keys(s.cat).sort(function(a,b){return s.cat[b]-s.cat[a]});
+ var h='<h1>月報</h1>'+mbar();
+ h+='<div class="card"><div class="mut">本月結餘（'+S.base+'）</div><div class="big '+(net>=0?'inc':'exp')+'">'+(net>=0?'+':'')+sg(net)+'</div><div class="mut">'+(net>=0?'這個月有存到錢 ✨':'這個月超支了，注意一下')+'</div>'
+  +'<div class="grid" style="margin-top:12px"><div><div class="mut">收入</div><b class="inc">'+fmt(s.i)+'</b></div><div><div class="mut">支出</div><b class="exp">'+fmt(s.e)+'</b></div></div>'
+  +(s.i>0?'<div class="mut" style="margin-top:8px">儲蓄率 '+Math.round(net/s.i*100)+'%</div>':'')+'</div>';
+ h+='<div class="card"><div class="mut">淨資產（'+S.base+'）</div><div class="big">'+sg(w.a-w.l)+'</div></div>';
+ var ks=EXP.filter(function(k){return getBud(month,k)>0});
+ if(ks.length)h+='<div class="card"><b>預算進度</b>'+ks.map(function(k){var sp=s.cat[k]||0,b=getBud(month,k),p=sp/b*100;return '<div style="margin-top:10px"><div class="row sp"><span>'+k+'</span><span class="'+(p>100?'exp':'')+'">'+fmt(sp)+' / '+fmt(b)+'</span></div><div class="bar"><i style="width:'+Math.min(p,100)+'%;background:'+(p>100?'var(--exp)':'var(--sage)')+'"></i></div></div>'}).join('')+'</div>';
+ if(cats.length)h+='<div class="card"><b>支出分類</b>'+cats.map(function(k,j){return '<div style="margin-top:10px"><div class="row sp"><span>'+esc(k)+'</span><span>'+fmt(s.cat[k])+'　<span class="mut">'+Math.round(s.cat[k]/s.e*100)+'%</span></span></div><div class="bar"><i style="width:'+(s.cat[k]/s.e*100)+'%;background:'+PAL[j%6]+'"></i></div></div>'}).join('')+'</div>';
+ return h;
+}
+
+function fix(){
+ var tot=0;S.fx.forEach(function(f){tot+=conv(f.a,f.c)/(f.f==='y'?12:1)});
+ var h='<h1>固定支出</h1><div class="card"><div class="mut">每月平均固定支出（'+S.base+'，年繳已攤提）</div><div class="big exp">'+fmt(tot)+'</div></div>';
+ h+='<div class="card"><b>新增固定支出</b><div class="f" style="margin-top:8px"><label>名稱</label><input id="fn" placeholder="例如：房貸、保險、鋼琴課"></div>'
+ +'<div class="grid"><div class="f"><label>金額</label><input id="fa" type="number" inputmode="decimal"></div><div class="f"><label>幣別</label><select id="fc">'+opts(CUR,S.last||'TWD')+'</select></div>'
+ +'<div class="f"><label>分類</label><select id="fk">'+opts(EXP)+'</select></div><div class="f"><label>週期</label><select id="ff"><option value="m">每月</option><option value="y">每年</option></select></div>'
+ +'<div class="f"><label>幾號繳</label><input id="fd" type="number" min="1" max="31"></div><div class="f"><label>年繳才填：幾月</label><input id="fm" type="number" min="1" max="12"></div></div>'
+ +'<button class="pri" onclick="addFx()">新增</button></div>';
+ var l=S.fx.map(function(f,i){var c=nextDue(f);return{f:f,i:i,c:c,n:dl(c)}}).sort(function(a,b){return a.n-b.n});
+ h+='<div class="card"><b>繳費清單</b>'+(l.length?l.map(function(x){return '<div class="item"><div><div>'+esc(x.f.n)+'　'+fmt(x.f.a)+' '+x.f.c+'</div><div class="mut">'+(x.f.f==='m'?'每月':'每年')+'・'+esc(x.f.k)+'・下次 '+x.c+'（'+dtxt(x.n)+'）</div></div><div class="row"><a class="sm" style="display:inline-flex;align-items:center;text-decoration:none;border-radius:10px" target="_blank" rel="noopener noreferrer" href="'+esc(gcalUrl(x.i))+'">📅 行事曆</a><button class="sm" onclick="payFx('+x.i+')">已繳</button><button class="x" onclick="delFx('+x.i+')">✕</button></div></div>'}).join(''):'<div class="mut" style="margin-top:8px">還沒有項目</div>')+'</div>';
+ return h+'<div class="mut">按「已繳」會自動記一筆支出，並跳到下一個繳費日。</div>';
+}
+function addFx(){var n=document.getElementById('fn').value.trim(),a=parseFloat(document.getElementById('fa').value),y=document.getElementById('ff').value==='y',
+ d=parseInt(document.getElementById('fd').value),m=parseInt(document.getElementById('fm').value);
+ if(!n||!(a>0)||!(d>=1&&d<=31)||(y&&!(m>=1&&m<=12))){alert('請填寫名稱、金額、繳費日（年繳要填月份）');return}
+ var f={n:n,a:a,c:document.getElementById('fc').value,k:document.getElementById('fk').value,f:y?'y':'m',day:d,mon:m||1,last:null};
+ var c=nextDue(f);if(c<td())f.last=c;S.fx.push(f);save();render()}
+function payFx(i){var f=S.fx[i],c=nextDue(f);S.tx.push({id:Date.now(),t:'exp',a:f.a,c:f.c,k:f.k,d:td(),n:f.n});f.last=c;save();render()}
+function gcalUrl(i){var f=S.fx[i],c=nextDue(f),e=addD(c,1);
+ var u='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('💰 繳費：'+f.n+' '+fmt(f.a)+' '+f.c)+'&dates='+c.replace(/-/g,'')+'/'+e.replace(/-/g,'')+'&details='+encodeURIComponent('分類：'+f.k+'\n繳完請到「日日有餘」按「已繳」記帳')+'&recur='+encodeURIComponent('RRULE:FREQ='+(f.f==='m'?'MONTHLY':'YEARLY'))+'&ctz=Asia/Macau';
+ return u}
+function delFx(i){S.fx.splice(i,1);save();render()}
+
+function bud(){
+ var s=sums(month),tot=0;EXP.forEach(function(k){tot+=getBud(month,k)});
+ var h='<h1>月度預算</h1>'+mbar()+'<div class="card"><div class="mut">'+month+' 預算總額（'+S.base+'）</div><div class="big">'+fmt(tot)+'</div><div class="mut">本月已花 '+fmt(s.e)+(tot>0?'・'+(s.e>tot?'超出 '+fmt(s.e-tot):'剩 '+fmt(tot-s.e)):'')+'</div>'
+ +'<div class="grid" style="margin-top:10px"><button class="sm" onclick="copyPrev()">沿用上個月</button><button class="sm" onclick="setDef()">設為預設</button></div><div class="mut" style="margin-top:6px">每個月可單獨調整；「預設」會套用在沒調整過的月份。</div></div>';
+ h+='<div class="card"><b>各項預算上限</b>'+EXP.map(function(k){var x=s.cat[k]||0,b=getBud(month,k),p=b?x/b*100:0;
+  return '<div style="margin-top:12px"><div class="row sp"><span>'+k+'</span><span class="mut">已花 '+fmt(x)+'</span></div><input type="number" inputmode="decimal" value="'+(b||'')+'" placeholder="不設限" onchange="setBud(\''+k+'\',this.value)">'+(b?'<div class="bar"><i style="width:'+Math.min(p,100)+'%;background:'+(p>100?'var(--exp)':'var(--sage)')+'"></i></div>':'')+'</div>'}).join('')+'</div>';
+ return h;
+}
+function setBud(k,v){if(!S.bm[month])S.bm[month]={};S.bm[month][k]=parseFloat(v)||0;save();render()}
+function copyPrev(){var p=month.split('-'),d=new Date(+p[0],+p[1]-2,1),pm=d.getFullYear()+'-'+pad(d.getMonth()+1);S.bm[month]={};EXP.forEach(function(k){S.bm[month][k]=getBud(pm,k)});save();render()}
+function setDef(){S.bud={};EXP.forEach(function(k){S.bud[k]=getBud(month,k)});save();alert('已把 '+month+' 的預算設為預設')}
+
+function chart(){
+ var d=S.snaps.slice().sort(function(a,b){return a.d<b.d?-1:1}).slice(-24);
+ if(d.length<2)return '<div class="mut" style="margin-top:8px">每次更新資產會自動記錄當天快照，累積 2 天以上就會畫出趨勢。</div>';
+ var r=S.rates[S.base],v=d.map(function(x){return x.nw/r}),mn=Math.min.apply(null,v),mx=Math.max.apply(null,v),rg=(mx-mn)||1,W=320,H=130;
+ var pts=v.map(function(y,i){return (10+i*(W-20)/(v.length-1)).toFixed(1)+','+(H-15-(y-mn)/rg*(H-35)).toFixed(1)});
+ return '<svg viewBox="0 0 '+W+' '+(H+10)+'" style="width:100%;margin-top:8px"><polyline points="'+pts.join(' ')+'" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linejoin="round"/>'
+ +pts.map(function(p){var q=p.split(',');return '<circle cx="'+q[0]+'" cy="'+q[1]+'" r="3" fill="var(--exp)"/>'}).join('')
+ +'<text x="10" y="'+(H+6)+'" font-size="10" fill="var(--mut)">'+d[0].d+'</text><text x="'+(W-10)+'" y="'+(H+6)+'" font-size="10" text-anchor="end" fill="var(--mut)">'+d[d.length-1].d+'</text>'
+ +'<text x="10" y="10" font-size="10" fill="var(--mut)">高 '+fmt(mx)+'</text><text x="'+(W-10)+'" y="10" font-size="10" text-anchor="end" fill="var(--mut)">低 '+fmt(mn)+'</text></svg>';
+}
+function assets(){
+ var w=worth(),nw=w.a-w.l;
+ var h='<h1>資產與負債</h1><div class="card"><div class="mut">淨資產（'+S.base+'）</div><div class="big">'+sg(nw)+'</div>'
+ +AC.filter(function(k){return w.by[k]}).map(function(k){var neg=k==='房貸／負債';return '<div class="row sp" style="margin-top:8px"><span>'+k+'</span><span class="'+(neg?'exp':'')+'">'+(neg?'-':'')+fmt(w.by[k])+'</span></div>'}).join('')+'</div>';
+ h+='<div class="card"><b>淨資產趨勢</b>'+chart()+'</div>';
+ h+='<div class="card"><b>新增項目</b><div class="f" style="margin-top:8px"><label>名稱</label><input id="an" placeholder="例如：台積電、台灣房貸"></div><div class="grid"><div class="f"><label>類別</label><select id="ak">'+opts(AC)+'</select></div><div class="f"><label>幣別</label><select id="ac">'+opts(CUR)+'</select></div></div><div class="f"><label>目前金額（負債填欠款餘額）</label><input id="av" type="number" inputmode="decimal"></div><button class="pri" onclick="addAs()">新增</button></div>';
+ h+='<div class="card"><b>我的項目</b>'+(S.as.length?'<div class="mut">金額可直接修改，記得定期更新</div>':'')+S.as.map(function(x,i){return '<div class="item"><div style="flex:1"><div>'+esc(x.n)+'</div><div class="mut">'+x.k+' · '+x.c+'</div></div><div class="row" style="width:170px"><input type="number" value="'+x.v+'" onchange="upAs('+i+',this.value)"><button class="x" onclick="delAs('+i+')">✕</button></div></div>'}).join('')+'</div>';
+ return h;
+}
+function addAs(){var v=parseFloat(document.getElementById('av').value),n=document.getElementById('an').value.trim();if(!n||isNaN(v)){alert('請填名稱與金額');return}
+ S.as.push({n:n,k:document.getElementById('ak').value,c:document.getElementById('ac').value,v:v});snap();render()}
+function upAs(i,v){S.as[i].v=parseFloat(v)||0;snap();render()}
+function delAs(i){S.as.splice(i,1);snap();render()}
+
+function R(n){return Math.round(n*100)/100}
+function sheet(rows,wd){var w=XLSX.utils.aoa_to_sheet(rows);w['!cols']=wd.map(function(x){return{wch:x}});return w}
+async function exportXlsx(){
+ var dlc=null;try{if(typeof claude!=='undefined')dlc=await claude.use('downloads')}catch(e){}
+ if(!window.XLSX){alert('Excel 元件載入失敗，請確認網路連線。');return}
+ var s=sums(month),w=worth(),B=S.base,wb=XLSX.utils.book_new();
+ XLSX.utils.book_append_sheet(wb,sheet([['月報表',month],['折合幣別',B],[],['總收入',R(s.i)],['總支出',R(s.e)],['結餘',R(s.i-s.e)],['儲蓄率',s.i>0?R((s.i-s.e)/s.i):''],[],['淨資產',R(w.a-w.l)],['總資產',R(w.a)],['總負債',R(w.l)]],[14,16]),'摘要');
+ var rows=[['日期','類型','品項','分類','金額','幣別','折合'+B]];
+ mt(month).sort(function(a,b){return a.d<b.d?-1:1}).forEach(function(t){rows.push([t.d,t.t==='inc'?'收入':'支出',t.n||t.k,t.k,t.a,t.c,R(conv(t.a,t.c))])});
+ XLSX.utils.book_append_sheet(wb,sheet(rows,[12,8,22,12,12,8,14]),'明細');
+ var b=[['分類','支出（'+B+'）','預算','差額']];
+ EXP.forEach(function(k){var x=s.cat[k]||0,g=getBud(month,k);if(x||g)b.push([k,R(x),g||'',g?R(g-x):''])});
+ XLSX.utils.book_append_sheet(wb,sheet(b,[14,16,12,12]),'分類與預算');
+ XLSX.utils.book_append_sheet(wb,sheet([['名稱','類別','幣別','金額','折合'+B]].concat(S.as.map(function(x){return [x.n,x.k,x.c,x.v,R((x.k==='房貸／負債'?-1:1)*conv(x.v,x.c))]})),[20,14,8,14,14]),'資產負債');
+ XLSX.utils.book_append_sheet(wb,sheet([['名稱','分類','週期','金額','幣別','下次繳費日']].concat(S.fx.map(function(f){return [f.n,f.k,f.f==='m'?'每月':'每年',f.a,f.c,nextDue(f)]})),[20,12,8,12,8,14]),'固定支出');
+ try{var fn='記帳報表-'+month+'.xlsx',buf=XLSX.write(wb,{bookType:'xlsx',type:'array'});if(!dlc){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([buf]));a.download=fn;document.body.appendChild(a);a.click();a.remove();return}await dlc.save({filename:fn,data:buf})}catch(e){if(!e||e.code!=='declined')alert('下載失敗：'+((e&&(e.message||e.code))||''))}
+}
+function more(){
+ var s=sums(month);
+ return '<h1>更多</h1>'+mbar()+'<div class="card"><b>Excel 月報表</b><div class="mut" style="margin:4px 0 10px">'+month+'：收入 '+fmt(s.i)+'・支出 '+fmt(s.e)+'・'+mt(month).length+' 筆。含摘要、明細、分類與預算、資產負債、固定支出五張工作表。</div><button class="pri" onclick="exportXlsx()">下載 Excel（.xlsx）</button></div>'
+ +'<div class="card"><div class="f"><label>總覽顯示幣別</label><select onchange="S.base=this.value;save();render()">'+opts(CUR,S.base)+'</select></div></div>'
+ +'<div class="card"><b>匯率（1 單位 = 多少台幣）</b><div class="mut">預設為概略值，請依實際匯率修改</div><div class="grid" style="margin-top:8px">'+CUR.filter(function(c){return c!=='TWD'}).map(function(c){return '<div class="f"><label>'+c+' '+CN[c]+'</label><input type="number" step="any" value="'+S.rates[c]+'" onchange="S.rates[\''+c+'\']=parseFloat(this.value)||1;save()"></div>'}).join('')+'</div></div>'
+ +'<div class="card"><b>備份</b><div class="mut">資料只存在這個瀏覽器，請定期備份。</div><textarea id="bk" style="width:100%;height:70px;margin-top:8px"></textarea><div class="grid" style="margin-top:8px"><button onclick="document.getElementById(\'bk\').value=JSON.stringify(S)">產生備份文字</button><button onclick="restore()">貼上並還原</button></div></div>';
+}
+function restore(){try{load(JSON.parse(document.getElementById('bk').value));save();render()}catch(e){alert('備份格式不正確')}}
+snap();render();
+</script>
+</body>
+</html>
