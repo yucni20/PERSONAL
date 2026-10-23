@@ -84,6 +84,10 @@ nav .ic{font-size:19px;line-height:1.2}
 .dots{max-width:40px}
 @media (max-width:380px){.big{font-size:24px}.ttl{font-size:20px;letter-spacing:3px}.tag{font-size:11px;letter-spacing:0}.dt b{font-size:14px}.card{padding:12px}}
 body{overscroll-behavior-y:none}
+#toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));width:calc(100% - 28px);max-width:452px;transform:translateX(-50%) translateY(16px);background:var(--tx);color:var(--bg);border-radius:14px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px;line-height:1.4;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:30;box-shadow:0 6px 20px #00000033}
+#toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto}
+#toast small{opacity:.8;font-size:12.5px}
+#toast button{background:none;border:0;color:var(--sage);font-weight:700;min-height:36px;padding:0 6px;flex:none}
 .item>div:first-child{flex:1;min-width:0}
 .bcol{display:flex;flex-direction:column;gap:6px;flex:none;width:84px}
 .bcol .sm,.bcol a.sm{width:100%;justify-content:center;text-align:center;padding:6px 4px;white-space:nowrap}
@@ -153,7 +157,7 @@ function nextDue(f){if(f.mons&&f.mons.length)return nextMons(f);var t=td(),y=+t.
 function dl(c){return Math.round((new Date(c+'T00:00:00')-new Date(td()+'T00:00:00'))/864e5)}
 function dtxt(n){return n<0?'已逾期 '+(-n)+' 天':n===0?'今天到期':n+' 天後'}
 
-function hdr(){var n=new Date();document.getElementById('hd').innerHTML='<div class="hrow"><div class="logo">餘</div><div><div class="ttl">日日有餘</div><div class="tag">記一筆，離退休人生更近一點</div></div></div><div class="dt"><b>'+(n.getMonth()+1)+'月'+n.getDate()+'日</b>週'+WD[(n.getDay()+6)%7]+'</div>'}
+function hdr(){var n=new Date();document.getElementById('hd').innerHTML='<div class="hrow"><div class="logo">餘</div><div><div class="ttl">日日有餘</div><div class="tag">記一筆，離豬富自由更近一點</div></div></div><div class="dt"><b>'+(n.getMonth()+1)+'月'+n.getDate()+'日</b>週'+WD[(n.getDay()+6)%7]+'</div>'}
 function render(){hdr();
  function I(p){return '<span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true">'+p+'</svg></span>'}
  var T=[['home',I('<path d="M4 20l1-4L16.5 4.5a2 2 0 013 3L8 19l-4 1z"/><path d="M14 7l3 3"/>')+'記帳'],['mon',I('<path d="M5 20V10M12 20V4M19 20v-7"/>')+'月報'],['fix',I('<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>')+'固定'],['bud',I('<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V12h8.5"/>')+'預算'],['as',I('<path d="M4 8V6.5A1.5 1.5 0 015.5 5H18"/><rect x="4" y="8" width="16" height="11" rx="2.5"/><circle cx="16" cy="13.5" r="1"/>')+'資產'],['more',I('<circle cx="6" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="18" cy="12" r="1.2"/>')+'更多']];
@@ -228,7 +232,17 @@ function addFx(){var n=document.getElementById('fn').value.trim(),a=parseFloat(d
  if(!n||!(a>0)||!(d>=1&&d<=31)||(y&&!(m>=1&&m<=12))){alert('請填寫名稱、金額、繳費日（每季、每年要填月份）');return}
  var f={n:n,a:a,c:document.getElementById('fc').value,k:document.getElementById('fk').value,f:fq,t:document.getElementById('ft').value,day:d,mon:m||1,mons:ms.length>1&&fq!=='m'?ms:null,last:null};
  var c=nextDue(f);if(c<td())f.last=c;S.fx.push(f);save();render()}
-function payFx(i){var f=S.fx[i],c=nextDue(f);S.tx.push({id:Date.now(),t:f.t==='inc'?'inc':'exp',a:f.a,c:f.c,k:f.k,d:td(),n:f.n});f.last=c;save();render()}
+var UNDO=null,TOT=null;
+function toast(msg,undo){var e=document.getElementById('toast');if(!e){e=document.createElement('div');e.id='toast';document.body.appendChild(e)}
+ e.innerHTML='<span>'+msg+'</span>'+(undo?'<button type="button" onclick="undoPay()">復原</button>':'');e.className='show';clearTimeout(TOT);TOT=setTimeout(function(){e.className=''},7000)}
+function payFx(i){var f=S.fx[i],c=nextDue(f),n=dl(c);
+ if(n>35&&!confirm(f.n+' 的下次日期是 '+c+'（還有 '+n+' 天），確定要現在就記帳嗎？'))return;
+ var id=Date.now(),inc=f.t==='inc';
+ S.tx.push({id:id,t:inc?'inc':'exp',a:f.a,c:f.c,k:f.k,d:td(),n:f.n});
+ UNDO={id:id,f:f,last:f.last||null};
+ f.last=c;save();render();
+ toast('✓ 已記一筆'+(inc?'收入':'支出')+'：'+esc(f.n)+' '+fmt(f.a)+' '+f.c+'<br><small>下次：'+nextDue(f)+'</small>',true)}
+function undoPay(){if(!UNDO)return;UNDO.f.last=UNDO.last;S.tx=S.tx.filter(function(t){return t.id!==UNDO.id});UNDO=null;save();render();toast('已復原')}
 function FL(f){return f.f==='m'?'每月':f.f==='q'?'每季':'每年'}
 function gcalUrl(i){var f=S.fx[i],c=nextDue(f),e=addD(c,1);
  var u='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent((f.t==='inc'?'💵 入帳：':'💰 繳費：')+f.n+' '+fmt(f.a)+' '+f.c)+'&dates='+c.replace(/-/g,'')+'/'+e.replace(/-/g,'')+'&details='+encodeURIComponent('分類：'+f.k+'\n繳完請到「日日有餘」按「已繳」記帳')+'&recur='+encodeURIComponent('RRULE:FREQ='+(f.mons&&f.mons.length?'YEARLY;BYMONTH='+f.mons.join(','):f.f==='y'?'YEARLY':'MONTHLY')+(!f.mons&&f.f==='q'?';INTERVAL=3':''))+'&ctz=Asia/Macau';
