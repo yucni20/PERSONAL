@@ -151,9 +151,10 @@ function worth(){var a=0,l=0,by={};S.as.forEach(function(x){var v=conv(x.v,x.c);
 function snap(f){if(!S.as.length)return;var w=worth(),r=S.rates[S.base],t=td(),o={d:t,nw:(w.a-w.l)*r,a:w.a*r,l:w.l*r};
  var i=S.snaps.findIndex(function(x){return x.d===t});if(i>=0)S.snaps[i]=o;else S.snaps.push(o);saveLocal();if(f){save()}}
 function mk(y,m,d){y+=Math.floor((m-1)/12);m=((m-1)%12+12)%12+1;d=Math.min(d,new Date(y,m,0).getDate());return y+'-'+pad(m)+'-'+pad(d)}
-function nextMons(f){var t=td(),y=+t.slice(0,4),ym=t.slice(0,7),L=[],c=0,i;for(var yy=y-1;yy<=y+1;yy++)f.mons.forEach(function(mm){L.push(mk(yy,mm,f.day))});L.sort();for(i=0;i<L.length;i++)if(L[i].slice(0,7)<=ym)c=i;if(f.last)while(c<L.length-1&&L[c]<=f.last)c++;return L[c]}
-function nextDue(f){if(f.mons&&f.mons.length)return nextMons(f);var t=td(),y=+t.slice(0,4),m=+t.slice(5,7),st=f.f==='q'?3:1,a=f.f==='m'?m:f.mon,mq=m-(((m-a)%st)+st)%st,c=f.f==='y'?mk(y,f.mon,f.day):mk(y,mq,f.day);
- if(f.last&&c<=f.last)c=f.f==='y'?mk(y+1,f.mon,f.day):mk(y,mq+st,f.day);return c}
+function dueM(f,m){if(f.mons&&f.mons.length)return f.mons.indexOf(m)>=0;if(f.f==='m')return true;if(f.f==='y')return m===f.mon;return ((m-f.mon)%3+3)%3===0}
+function nextDue(f){if(f.nx&&(!f.last||f.nx>f.last))return f.nx;
+ var b=f.last||td(),y=+b.slice(0,4),m=+b.slice(5,7),c,i;
+ for(i=0;i<240;i++){c=mk(y,m+i,f.day);if(dueM(f,+c.slice(5,7))&&(!f.last||c>f.last))return c}return c}
 function dl(c){return Math.round((new Date(c+'T00:00:00')-new Date(td()+'T00:00:00'))/864e5)}
 function dtxt(n){return n<0?'已逾期 '+(-n)+' 天':n===0?'今天到期':n+' 天後'}
 
@@ -216,22 +217,31 @@ function mon(){
 function fix(){
  var tot=0,ti=0;S.fx.forEach(function(f){var v=conv(f.a,f.c)/(f.mons&&f.mons.length?12/f.mons.length:f.f==='y'?12:f.f==='q'?3:1);if(f.t==='inc')ti+=v;else tot+=v});
  var h='<h1>固定收支</h1><div class="card"><div class="grid"><div><div class="mut">每月平均固定收入</div><div class="big inc">'+fmt(ti)+'</div></div><div><div class="mut">每月平均固定支出</div><div class="big exp">'+fmt(tot)+'</div></div></div><div class="mut" style="margin-top:6px">'+S.base+'・每季、每年已攤成每月</div></div>';
- h+='<div class="card"><b>新增固定收支</b><div class="f" style="margin-top:8px"><label>名稱</label><input id="fn" placeholder="例如：房貸、鋼琴課、股息、租金"></div>'
- +'<div class="grid"><div class="f"><label>金額</label><input id="fa" type="number" inputmode="decimal"></div><div class="f"><label>幣別</label><select id="fc">'+opts(CUR,'MOP')+'</select></div>'
- +'<div class="f"><label>類型</label><select id="ft" onchange="document.getElementById(\'fk\').innerHTML=opts(this.value===\'inc\'?INC:EXP)"><option value="exp">支出（要繳的）</option><option value="inc">收入（股息、租金…）</option></select></div><div class="f"><label>分類</label><select id="fk">'+opts(EXP)+'</select></div><div class="f"><label>週期</label><select id="ff"><option value="m">每月</option><option value="q">每季</option><option value="y">每年</option></select></div>'
- +'<div class="f"><label>幾號繳</label><input id="fd" type="number" min="1" max="31"></div><div class="f" style="grid-column:1/-1"><label>月份（每季／每年才選，可點選多個）</label><input id="fm" type="hidden"><div class="mch">'+MCH()+'</div></div></div>'
- +'<button class="pri" onclick="addFx()">新增</button></div>';
+ var e=EDIT!=null?S.fx[EDIT]:null,et=e?e.t:'exp',ems=e?(e.mons&&e.mons.length?e.mons:(e.f==='m'?[]:e.f==='y'?[e.mon]:[0,3,6,9].map(function(k){return (e.mon-1+k)%12+1}).sort(function(p,q){return p-q}))):[];
+ function so(v,t,cur){return '<option value="'+v+'"'+(v===cur?' selected':'')+'>'+t+'</option>'}
+ h+='<div class="card" id="fxform"'+(e?' style="border:2px solid var(--ac)"':'')+'><b>'+(e?'✏️ 修改「'+esc(e.n)+'」':'新增固定收支')+'</b><div class="f" style="margin-top:8px"><label>名稱</label><input id="fn" placeholder="例如：房貸、鋼琴課、股息、租金" value="'+(e?esc(e.n):'')+'"></div>'
+ +'<div class="grid"><div class="f"><label>金額</label><input id="fa" type="number" inputmode="decimal" value="'+(e?e.a:'')+'"></div><div class="f"><label>幣別</label><select id="fc">'+opts(CUR,e?e.c:'MOP')+'</select></div>'
+ +'<div class="f"><label>類型</label><select id="ft" onchange="document.getElementById(\'fk\').innerHTML=opts(this.value===\'inc\'?INC:EXP)">'+so('exp','支出（要繳的）',et)+so('inc','收入（股息、租金…）',et)+'</select></div><div class="f"><label>分類</label><select id="fk">'+opts(et==='inc'?INC:EXP,e?e.k:null)+'</select></div><div class="f"><label>週期</label><select id="ff">'+so('m','每月',e?e.f:'m')+so('q','每季',e?e.f:'m')+so('y','每年',e?e.f:'m')+'</select></div>'
+ +'<div class="f"><label>幾號繳</label><input id="fd" type="number" min="1" max="31" value="'+(e?e.day:'')+'"></div><div class="f" style="grid-column:1/-1"><label>月份（每季／每年才選，可點選多個）</label><input id="fm" type="hidden" value="'+ems.join(',')+'"><div class="mch">'+MCH(ems)+'</div></div>'
+ +(e?'<div class="f" style="grid-column:1/-1"><label>下次繳費日（跳錯可以直接改這裡）</label><input id="fnx" type="date" value="'+nextDue(e)+'"></div>':'')+'</div>'
+ +(e?'<button class="pri" onclick="saveFx()">儲存修改</button><button style="width:100%;margin-top:8px" onclick="EDIT=null;render()">取消</button>':'<button class="pri" onclick="addFx()">新增</button>')+'</div>';
  var l=S.fx.map(function(f,i){var c=nextDue(f);return{f:f,i:i,c:c,n:dl(c)}}).sort(function(a,b){return a.n-b.n});
- h+='<div class="card"><b>收付清單</b>'+(l.length?l.map(function(x){return '<div class="sw"><div class="swc"><button class="ck" onclick="payFx('+x.i+')" aria-label="'+(x.f.t==='inc'?'已收':'已繳')+'"></button><div class="swt"><div>'+esc(x.f.n)+'　'+fmt(x.f.a)+' '+x.f.c+'</div><div class="mut">'+FL(x.f)+(x.f.mons&&x.f.mons.length?'（'+x.f.mons.join('、')+'月）':'')+'・'+esc(x.f.k)+'・下次 '+x.c+'（'+dtxt(x.n)+'）</div></div><a class="cal" target="_blank" rel="noopener noreferrer" href="'+esc(gcalUrl(x.i))+'" aria-label="加到 Google 行事曆">📅</a></div><button class="swd" onclick="delFx('+x.i+')">刪除</button></div>'}).join(''):'<div class="mut" style="margin-top:8px">還沒有項目</div>')+'</div>';
- return h+'<div class="mut">點左邊的方格＝已繳／已收（自動記帳並跳到下一次）；點 📅 加到行事曆；往左滑可刪除。</div>';
+ h+='<div class="card"><b>收付清單</b>'+(l.length?l.map(function(x){return '<div class="sw"><div class="swc"><button class="ck" onclick="payFx('+x.i+')" aria-label="'+(x.f.t==='inc'?'已收':'已繳')+'"></button><div class="swt" onclick="editFx('+x.i+')" style="cursor:pointer"><div>'+esc(x.f.n)+'　'+fmt(x.f.a)+' '+x.f.c+'</div><div class="mut">'+FL(x.f)+(x.f.mons&&x.f.mons.length?'（'+x.f.mons.join('、')+'月）':'')+'・'+esc(x.f.k)+'・下次 '+x.c+'（'+dtxt(x.n)+'）</div></div><a class="cal" target="_blank" rel="noopener noreferrer" href="'+esc(gcalUrl(x.i))+'" aria-label="加到 Google 行事曆">📅</a></div><button class="swd" onclick="delFx('+x.i+')">刪除</button></div>'}).join(''):'<div class="mut" style="margin-top:8px">還沒有項目</div>')+'</div>';
+ return h+'<div class="mut">點左邊的方格＝已繳／已收（自動記帳並跳到下一次）；點項目文字可以修改；點 📅 加到行事曆；往左滑可刪除。</div>';
 }
-function MCH(){var r='';for(var i=1;i<=12;i++)r+='<button type="button" class="mc" onclick="tgM(this)">'+i+'月</button>';return r}
+function MCH(on){on=on||[];var r='';for(var i=1;i<=12;i++)r+='<button type="button" class="mc'+(on.indexOf(i)>=0?' on':'')+'" onclick="tgM(this)">'+i+'月</button>';return r}
 function tgM(b){b.classList.toggle('on');var v=[].slice.call(document.querySelectorAll('.mc.on')).map(function(x){return parseInt(x.textContent)});document.getElementById('fm').value=v.join(',')}
-function addFx(){var n=document.getElementById('fn').value.trim(),a=parseFloat(document.getElementById('fa').value),fq=document.getElementById('ff').value,y=fq!=='m',
+function readFx(){var n=document.getElementById('fn').value.trim(),a=parseFloat(document.getElementById('fa').value),fq=document.getElementById('ff').value,y=fq!=='m',
  d=parseInt(document.getElementById('fd').value),ms=(document.getElementById('fm').value.match(/\d+/g)||[]).map(Number).filter(function(x){return x>=1&&x<=12}).filter(function(x,i,a){return a.indexOf(x)===i}).sort(function(a,b){return a-b}),m=ms[0];
- if(!n||!(a>0)||!(d>=1&&d<=31)||(y&&!(m>=1&&m<=12))){alert('請填寫名稱、金額、繳費日（每季、每年要填月份）');return}
- var f={n:n,a:a,c:document.getElementById('fc').value,k:document.getElementById('fk').value,f:fq,t:document.getElementById('ft').value,day:d,mon:m||1,mons:ms.length>1&&fq!=='m'?ms:null,last:null};
- var c=nextDue(f);if(c<td())f.last=c;S.fx.push(f);save();render()}
+ if(!n||!(a>0)||!(d>=1&&d<=31)||(y&&!(m>=1&&m<=12))){alert('請填寫名稱、金額、繳費日（每季、每年要填月份）');return null}
+ return {n:n,a:a,c:document.getElementById('fc').value,k:document.getElementById('fk').value,f:fq,t:document.getElementById('ft').value,day:d,mon:m||1,mons:ms.length>1&&fq!=='m'?ms:null,last:null,nx:null}}
+function addFx(){var f=readFx();if(!f)return;var c=nextDue(f);if(c<td())f.last=c;S.fx.push(f);save();render()}
+var EDIT=null;
+function editFx(i){EDIT=i;render();var e=document.getElementById('fxform');if(e)e.scrollIntoView({behavior:'smooth',block:'start'})}
+function saveFx(){var o=S.fx[EDIT];if(!o){EDIT=null;render();return}var f=readFx();if(!f)return;
+ var nx=(document.getElementById('fnx')||{}).value||'';
+ if(nx){f.nx=nx;f.last=null}else{f.last=o.last||null}
+ S.fx[EDIT]=f;EDIT=null;save();render();toast('✓ 已儲存，下次：'+nextDue(f))}
 var UNDO=null,TOT=null;
 function toast(msg,undo){var e=document.getElementById('toast');if(!e){e=document.createElement('div');e.id='toast';document.body.appendChild(e)}
  e.innerHTML='<span>'+msg+'</span>'+(undo?'<button type="button" onclick="undoPay()">復原</button>':'');e.className='show';clearTimeout(TOT);TOT=setTimeout(function(){e.className=''},7000)}
@@ -239,15 +249,15 @@ function payFx(i){var f=S.fx[i],c=nextDue(f),n=dl(c);
  if(n>35&&!confirm(f.n+' 的下次日期是 '+c+'（還有 '+n+' 天），確定要現在就記帳嗎？'))return;
  var id=Date.now(),inc=f.t==='inc';
  S.tx.push({id:id,t:inc?'inc':'exp',a:f.a,c:f.c,k:f.k,d:td(),n:f.n});
- UNDO={id:id,f:f,last:f.last||null};
- f.last=c;save();render();
+ UNDO={id:id,f:f,last:f.last||null,nx:f.nx||null};
+ f.last=c;f.nx=null;save();render();
  toast('✓ 已記一筆'+(inc?'收入':'支出')+'：'+esc(f.n)+' '+fmt(f.a)+' '+f.c+'<br><small>下次：'+nextDue(f)+'</small>',true)}
-function undoPay(){if(!UNDO)return;UNDO.f.last=UNDO.last;S.tx=S.tx.filter(function(t){return t.id!==UNDO.id});UNDO=null;save();render();toast('已復原')}
+function undoPay(){if(!UNDO)return;UNDO.f.last=UNDO.last;UNDO.f.nx=UNDO.nx;S.tx=S.tx.filter(function(t){return t.id!==UNDO.id});UNDO=null;save();render();toast('已復原')}
 function FL(f){return f.f==='m'?'每月':f.f==='q'?'每季':'每年'}
 function gcalUrl(i){var f=S.fx[i],c=nextDue(f),e=addD(c,1);
  var u='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent((f.t==='inc'?'💵 入帳：':'💰 繳費：')+f.n+' '+fmt(f.a)+' '+f.c)+'&dates='+c.replace(/-/g,'')+'/'+e.replace(/-/g,'')+'&details='+encodeURIComponent('分類：'+f.k+'\n繳完請到「日日有餘」按「已繳」記帳')+'&recur='+encodeURIComponent('RRULE:FREQ='+(f.mons&&f.mons.length?'YEARLY;BYMONTH='+f.mons.join(','):f.f==='y'?'YEARLY':'MONTHLY')+(!f.mons&&f.f==='q'?';INTERVAL=3':''))+'&ctz=Asia/Macau';
  return u}
-function delFx(i){S.fx.splice(i,1);save();render()}
+function delFx(i){S.fx.splice(i,1);EDIT=null;save();render()}
 
 function bud(){
  var s=sums(month),tot=0;EXP.forEach(function(k){tot+=getBud(month,k)});
